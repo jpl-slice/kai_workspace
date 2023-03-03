@@ -16,7 +16,6 @@ lightning_logs/
 *.out
 *.sh
 *.csv
-*.yaml
 *.png
 *.npy
 # Created by https://www.toptal.com/developers/gitignore/api/python,pycharm,jupyternotebooks

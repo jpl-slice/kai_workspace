@@ -1,0 +1,81 @@
+# default configuration with all args specified
+defaults: [{ "": "default_config.yaml" }]
+# distributed training/slurm arguments
+nodes: 1
+gpus: 4 # I recommend always assigning 1 GPU to 1 node
+node_rank: 0 # machine nr. in node (0 -- nodes - 1)
+local_rank: -1  # range: (0 -- num_gpus_per_node - 1)
+dataparallel: 0 # Use DataParallel instead of DistributedDataParallel
+ddp: True # Use DistributedDataParallel
+workers: 16
+timeout: 3600
+partition: "v100*"
+
+# SLURM/Submitit Arguments
+slurm_job_name: "simclr"
+comment: "SimCLR run" # for slurm
+job_dir: "slurm_log/simclr_%j"  # log_ddp/%j
+master_addr: "127.0.0.1"  # this is the value used in Janne's implementation
+walltime: 2880  # in minutes (max walltime on Longhorn is 2,880 minutes)
+
+# train options
+seed: 42 # sacred handles automatic seeding when passed in the config
+batch_size: 128 # https://discuss.pytorch.org/t/do-dataparallel-and-distributeddataparallel-affect-the-batch-size-and-gpu-memory-consumption/97194
+image_size: 32
+start_epoch: 0
+epochs: 400
+dataset: "CIFAR10"
+dataset_dir: "/work/08452/kaipak/clover_shared/datasets/CIFAR10"
+# train_pct: 1.0
+train_file_map: ""
+test_file_map: ""
+use_file_map: False
+pretrain: False
+num_classes: 10
+num_images: -1  # Total number of training images in ImageNet
+use_wandb: True  # whether to use weights and biases
+tensorboard_log_dir: null  # None by default
+wandb_project: "cifar10_pretrain_investigation"  # WandB project name; unused if use_wandb = False
+wandb_run_id: null  # used to resume a previous wandb run
+wandb_preview_imgs: True
+
+# model options
+#
+resnet: "r50_1x_sk0"
+num_projection_layers: 2
+projection_dim: 64 # "[...] to project the representation to a 128-dimensional latent space"
+# Which layer of the projection head to use during fine-tuning.
+# Goes from [0, num_projection_layers],
+# where 0 is the encoder output or input into the contrastive head
+projection_output_layer: 0
+use_cifar_mod: True
+
+# loss options
+optimizer: "LARS" # Adam or LARS (experimental)
+base_learning_rate: 0.2 # Adam: 3E-4 (Spijkervet), LARS: [0.1, 0.2, 0.3] (Google, varies)
+weight_decay: 1.0e-4 # "optimized using LARS [...] and weight decay of 10−6" try 1E-4
+temperature: 0.2 # see appendix B.7.: Optimal temperature under different batch sizes
+learning_rate_scaling: "sqrt" # linear, sqrt, or none
+learning_rate_scheduler: "OneCycle" # Cosine or OneCycle
+cosine_annealing_eta_min: 0 # Default 0. Only applicable if learning_rate_scheduler is Cosine
+onecycle_div_factor: 25.0 # Default 25.0. Applicable for learning_rate_scheduler = OneCycle
+onecycle_final_div_factor: 10000.0 # Default 10000.0. Applicable for learning_rate_scheduler = OneCycle
+nt_xent_forward_method: "google"
+
+# reload options
+model_path: "/work/08452/kaipak/longhorn/model_output/cifar_test" # set to the directory containing `checkpoint_##.tar`
+epoch_num: 150 # set to checkpoint number
+reload: False
+
+# logistic regression (linear eval) options
+reload_during_eval: True # whether to load checkpoint during eval
+# if reload_during_eval = False and pretrain = False, a randomly initialized model will be evaluated
+# if reload_during_eval = False and pretrain = /path/to/r50_1x_sk0.pth, the pretrained model will be evaluated
+logistic_batch_size: 512
+logistic_epochs: 100
+early_stopping: False
+patience: 7  # patience for early stopping
+save_features: False
+reuse_features: False
+save_ext: 'csv'  # parquet or csv; parquet with pyarrow is faster
+zero_shot_eval: False

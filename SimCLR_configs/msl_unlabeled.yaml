@@ -1,0 +1,48 @@
+# default config
+defaults: [{ "": "default_config.yaml" }]
+
+# distributed training
+nodes: 1
+gpus: 1 # I recommend always assigning 1 GPU to 1 node
+node_rank: 0 # machine nr. in node (0 -- nodes - 1)
+nr: 0
+dataparallel: 0 # Use DataParallel instead of DistributedDataParallel
+ddp: False # Use DistributedDataParallel
+workers: 1
+
+# train options
+seed: 42 # sacred handles automatic seeding when passed in the config
+batch_size: 8 # https://discuss.pytorch.org/t/do-dataparallel-and-distributeddataparallel-affect-the-batch-size-and-gpu-memory-consumption/97194
+image_size: 256
+start_epoch: 0
+epochs: 800
+dataset: "DatasetMarsUnlabelled"
+dataset_dir: "/home/kaipak/datasets/msl_images"
+train_file_map: ""
+pretrain: False
+num_classes: 19
+# num_images: 5920
+train_pct: 1.0
+
+# model options
+resnet: "r50_1x_sk0"
+num_projection_layers: 2
+projection_dim: 128 # "[...] to project the representation to a 128-dimensional latent space"
+
+# loss options
+optimizer: "Adam" # or LARS (experimental)
+weight_decay: 1.0e-6 # "optimized using LARS [...] and weight decay of 10−6"
+temperature: 0.5 # see appendix B.7.: Optimal temperature under different batch sizes
+
+# reload options
+#model_path: "models/save_msl_test" # set to the directory containing `checkpoint_##.tar`
+epoch_num: 100 # set to checkpoint number
+reload: False
+reload_during_eval: True # whether to load checkpoint during eval
+# if reload_during_eval = False and pretrain = False, a randomly initialized model will be evaluated
+# if reload_during_eval = False and pretrain = /path/to/r50_1x_sk0.pth, the pretrained model will be evaluated
+
+# logistic regression (linear eval) options
+logistic_batch_size: 256
+logistic_epochs: 500
+save_features: False
