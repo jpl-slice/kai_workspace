@@ -23,7 +23,7 @@ batch_size: 171 # https://discuss.pytorch.org/t/do-dataparallel-and-distributedd
 image_size: 224
 start_epoch: 0
 epochs: 100
-dataset: "Unlabeled"
+dataset: "Mars2020"
 dataset_dir: "/scratch/08452/kaipak/datasets/msl_images"
 train_file_map: ""
 test_file_map: ""
@@ -36,6 +36,12 @@ tensorboard_log_dir: null  # None by default
 wandb_project: "SimCLR_refactor_tests_MSL"  # WandB project name; unused if use_wandb = False
 wandb_run_id: null  # used to resume a previous wandb run
 wandb_preview_imgs: False
+
+# clustering
+clustering_support_size: 8
+clustering_false_negative_sim_threshold: 0.7
+enable_clustering_training: True
+cluster_file_map: "/home1/08452/kaipak/clover_shared/clustered.csv"
 
 # model options
 resnet: "r50_1x_sk0"
@@ -57,7 +63,7 @@ learning_rate_scheduler: "OneCycle" # "Cosine" or "OneCycle"
 cosine_annealing_eta_min: 0 # Default 0. Only applicable if learning_rate_scheduler is Cosine
 onecycle_div_factor: 25.0 # Default 25.0. Applicable for learning_rate_scheduler = OneCycle
 onecycle_final_div_factor: 10000.0 # Default 10000.0. Applicable for learning_rate_scheduler = OneCycle
-nt_xent_forward_method: "google"
+nt_xent_forward_method: "clustering"
 
 # reload options
 model_path: "/work/08452/kaipak/ls6/model_output/msl_2M_refactor_test2" # set to the directory containing `checkpoint_##.tar`
@@ -69,9 +75,11 @@ reload_during_eval: True # whether to load checkpoint during eval
 # pretrain: "/work/08452/kaipak/ls6/model_output/simclr_pretrained/r50_1x_sk0.pth"
 # if reload_during_eval = False and pretrain = False, a randomly initialized model will be evaluated
 # if reload_during_eval = False and pretrain = /path/to/r50_1x_sk0.pth, the pretrained model will be evaluated
-logistic_learning_rate: 0.003
+logistic_learning_rate: 0.0003
 logistic_batch_size: 512
 logistic_epochs: 100
+#logistic_checkpoints: [49, 99, 149, 199, 249, 299, 349, 399, 449, 499]
+#logistic_checkpoints: [9, 49, 99, 149, 199, 249, 299, 349, 399, 449, 499]
 logistic_checkpoints: [9, 19, 29, 39, 49, 59, 69, 79, 89, 99]
 logistic_pcts: [0.01, 0.05, 0.1, 0.2, 0.5, 0.8, 1.0]
 early_stopping: False
