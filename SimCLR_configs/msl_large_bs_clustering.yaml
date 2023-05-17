@@ -63,7 +63,7 @@ learning_rate_scheduler: "OneCycle" # "Cosine" or "OneCycle"
 cosine_annealing_eta_min: 0 # Default 0. Only applicable if learning_rate_scheduler is Cosine
 onecycle_div_factor: 25.0 # Default 25.0. Applicable for learning_rate_scheduler = OneCycle
 onecycle_final_div_factor: 10000.0 # Default 10000.0. Applicable for learning_rate_scheduler = OneCycle
-nt_xent_forward_method: "clustering"
+nt_xent_forward_method: "google"
 
 # reload options
 model_path: "/work/08452/kaipak/ls6/model_output/msl_2M_refactor_test2" # set to the directory containing `checkpoint_##.tar`
