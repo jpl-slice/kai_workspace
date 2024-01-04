@@ -9,8 +9,7 @@ test_files=(/home1/08452/kaipak/clover_shared/datasets/California_SAR_Eddies_V2/
 gpu_id=(0 1 2)
 gpu_jobs=${#gpu_id[@]}
 logistic_learning_rates=(0.0001)
-checkpoints=(9 49 99 149 199 249)
-# checkpoints=(9 49)
+splits=(1 10 20 50)
 debug=false
 
 while getopts "p:d:" opt
@@ -22,23 +21,15 @@ do
 done
 
 for test_set_idx in {0..1}; do
-  for check_point in ${checkpoints[@]}; do
-    if $debug; then
-      echo "CUDA_VISIBLE_DEVICES=${gpu_id[$gpu_jobs - 1]} python ../linear_evaluation/linear_evaluation/finetune.py
-        --config ../linear_evaluation/config/sar_ft_simclrv2.yaml \
-        --test_dir ${test_sets[$test_set_idx]} \
-        --test_file_map ${test_files[$test_set_idx]} \
-        --pretrain ${simclr_run}/checkpoint_${check_point}.tar \
-        --wandb_project ${WANDB_PROJECT}"
-    else
-      echo "Starting job on ${gpu_id[$gpu_jobs - 1]}"
-      CUDA_VISIBLE_DEVICES=${gpu_id[$gpu_jobs - 1]} python ../linear_evaluation/linear_evaluation/finetune.py \
-        --config ../linear_evaluation/config/sar_ft_simclrv2.yaml \
-        --test_dir ${test_sets[$test_set_idx]} \
-        --test_file_map ${test_files[$test_set_idx]} \
-        --pretrain ${simclr_run}/checkpoint_${check_point}.tar \
-        --wandb_project ${WANDB_PROJECT} &
-    fi
+  for split in ${splits[@]}; do
+    echo "Starting job on ${gpu_id[$gpu_jobs - 1]}"
+    CUDA_VISIBLE_DEVICES=${gpu_id[$gpu_jobs - 1]} python ../linear_evaluation/linear_evaluation/finetune.py \
+      --config ../linear_evaluation/config/sar_ft_simclrv2.yaml \
+      --train_file_map /home1/08452/kaipak/clover_shared/corral/datasets/gee_sar_100k_reference_v1.0.0523/validation_med_subset_linear_labels_${split}pct.csv \
+      --test_dir ${test_sets[$test_set_idx]} \
+      --test_file_map ${test_files[$test_set_idx]} \
+      --pretrain ${simclr_run}/checkpoint_199.tar \
+      --wandb_project ${WANDB_PROJECT} &
     ((gpu_jobs--))
 
     if [[ $gpu_jobs -eq 0 ]]; then
