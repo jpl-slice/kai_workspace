@@ -1,3 +1,4 @@
+config.py
 tensorboard*
 *events.out.tfevents*
 wandb/
