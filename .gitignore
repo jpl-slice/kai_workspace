@@ -1,3 +1,4 @@
+config.py
 tensorboard*
 *events.out.tfevents*
 wandb/
@@ -17,6 +18,7 @@ lightning_logs/
 *.csv
 *.png
 *.npy
+*.zip
 # Created by https://www.toptal.com/developers/gitignore/api/python,pycharm,jupyternotebooks
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,pycharm,jupyternotebooks
 
